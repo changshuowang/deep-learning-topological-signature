@@ -1,0 +1,83 @@
+We provide code implementing the persistence layer of article
+"Deep Learning with Topological Signatures" presented in NIPS 2017 conference.
+We provide jupyter notebooks and datasets with precomputed persistence diagrams to reproduce the results.
+
+The layer is implemented in 4 C++ files: 
+
+persistence_vector.cc, 
+persistence_vector_grad.cc, 
+persistence_vector_essential.cc, 
+persistence_vector_essential_grad.cc
+
+and 2 registration files in python:
+
+_persistence_vector_grad.py,
+_persistence_vector_essential_grad.py,
+
+These files are in the "vector" folder and have to be compiled and then put in the Tensorflow repo. See 
+
+https://www.tensorflow.org/extend/adding_an_op
+
+for details on adding a new layer in Tensorflow set of operations.
+
+With Ubuntu 16.04, the steps are the following:
+
+###############################################################################################################################
+1. compile the persistence layer op for ordinary and essential persistence diagram and put the .so file in the Tensorflow repo. 
+###############################################################################################################################
+
+For instance, with python 2.7:
+
+sudo g++ -std=c++11 -shared persistence_vector.cc -o /usr/local/lib/python2.7/dist-packages/tensorflow/persistence_vector.so 
+-fPIC -I /usr/local/lib/python2.7/dist-packages/tensorflow/include -I /usr/local/lib/python2.7/dist-packages/tensorflow/include/external/nsync/public 
+-L /usr/local/lib/python2.7/dist-packages/tensorflow -ltensorflow_framework -O2
+
+sudo g++ -std=c++11 -shared persistence_vector_essential.cc -o /usr/local/lib/python2.7/dist-packages/tensorflow/persistence_vector_essential.so 
+-fPIC -I /usr/local/lib/python2.7/dist-packages/tensorflow/include -I /usr/local/lib/python2.7/dist-packages/tensorflow/include/external/nsync/public 
+-L /usr/local/lib/python2.7/dist-packages/tensorflow -ltensorflow_framework -O2
+
+#####################################################################################################################################
+2. compile the persistence layer gradient for ordinary and essential persistence diagram and put the .so file in the Tensorflow repo. 
+#####################################################################################################################################
+
+For instance, with python 2.7:
+
+sudo g++ -std=c++11 -shared persistence_vector_grad.cc -o /usr/local/lib/python2.7/dist-packages/tensorflow/persistence_vector_grad.so 
+-fPIC -I /usr/local/lib/python2.7/dist-packages/tensorflow/include -I /usr/local/lib/python2.7/dist-packages/tensorflow/include/external/nsync/public 
+-L /usr/local/lib/python2.7/dist-packages/tensorflow -ltensorflow_framework -O2
+
+sudo g++ -std=c++11 -shared persistence_vector_essential_grad.cc -o /usr/local/lib/python2.7/dist-packages/tensorflow/persistence_vector_essential_grad.so 
+-fPIC -I /usr/local/lib/python2.7/dist-packages/tensorflow/include -I /usr/local/lib/python2.7/dist-packages/tensorflow/include/external/nsync/public 
+-L /usr/local/lib/python2.7/dist-packages/tensorflow -ltensorflow_framework -O2
+
+#######################################################################################################################################################################
+3. check that the gradient registration files _persistence_vector_grad.py and _persistence_vector_essential_grad.py are located in the same directory as the notebooks.
+#######################################################################################################################################################################
+
+
+
+
+
+
+We also provide notebooks for the computation of persistence diagrams. In order to use them, you need to install the Gudhi library to your machine.
+Gudhi is an open source library implementing various topological constructions including persistence diagrams. It can be downloaded at http://gudhi.gforge.inria.fr/
+You have first to download the library, and then compile it, ideally with:
+
+cd /path/to/gudhi
+mkdir build
+cd build
+cmake ..
+make
+
+Then, you have to add the cython files to your PYTHONPATH. 
+
+With Ubuntu 16.04, you can do this locally by executing
+
+export PYTHONPATH=/path/to/gudhi/build/src/cython/
+
+in a terminal and then launching the jupyter notebooks from this terminal,
+or you can add 
+
+PYTHONPATH=/path/to/gudhi/build/src/cython/
+
+to the /etc/environment file.
